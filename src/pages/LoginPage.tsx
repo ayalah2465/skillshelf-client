@@ -1,4 +1,6 @@
 import { saveAccessToken } from "../services/auth";
+import {useNavigate} from "react-router-dom"
+import { useState } from "react";
 import {z} from "zod"
 export const loginSchema=z.object({
     email:z.string().email("כתובת המייל אינה תקינה"),
@@ -14,7 +16,11 @@ export type loginFormData=z.infer<typeof loginSchema>
 import {useForm} from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-export function LoginForm(){
+export function LoginForm({
+            onAuthSuccess,
+            }:{
+                 onAuthSuccess:()=>void;
+            }){
             const{
             register,
             handleSubmit,
@@ -27,7 +33,10 @@ export function LoginForm(){
                 password:"",
             },
         });
+        const navigate=useNavigate();
+        const [submitError, setSubmitError] = useState("");
     const submit=async(data:loginFormData)=>{
+        setSubmitError("");
         try{
             const response=await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`,{
                 method:"POST",
@@ -53,26 +62,63 @@ export function LoginForm(){
                 throw new Error("שגיאה בהתחברות: לא התקבל אסימון גישה תקין מהשרת");
             }
             saveAccessToken(result.accessToken);
-            alert("התחברות בוצעה בהצלחה");
+            onAuthSuccess();
+            navigate("/",{replace:true});
         } catch (error) {
             const message=error instanceof Error?error.message:"שגיאה בהתחברות";
-            alert(message);
-        }
+            setSubmitError(message);        }
     };
         return(
         <form
         onSubmit={handleSubmit(submit)}
-        style={{maxWidth:"400px",display:"flex",flexDirection:"column",gap:"10px"}}
+        className="mx-auto flex w-full max-w-md flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
         >
+            <h1 className="text-2xl font-bold text-slate-900">
+             התחברות
+            </h1>
             <div>
-                <input type="email"{...register("email")}placeholder="אימייל"/>
+                <label
+                 htmlFor="login-email"
+                className="mb-2 block text-sm font-medium text-slate-700"
+                >
+                 כתובת דוא״ל
+                </label>
+                <input 
+                id="login-email"
+                className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                dir="ltr"
+                type="email"{...register("email")}placeholder="אימייל"/>
                 {errors.email&&<p style={{color:"red",margin:0}}>{errors.email.message}</p>}
             </div>
             <div>
-                <input type="password"{...register("password")}placeholder="סיסמה"/>
+                <label
+                htmlFor="login-password"
+                className="mb-2 block text-sm font-medium text-slate-700"
+                >
+                 סיסמה
+                </label>
+                <input 
+                id="login-password"
+                className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                dir="ltr"
+                type="password"{...register("password")}placeholder="סיסמה"/>
                 {errors.password&&<p style={{color:"red",margin:0}}>{errors.password.message}</p>}
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                 לפחות 10 תווים, כולל אות גדולה באנגלית,
+                 אות קטנה באנגלית וספרה.
+                </p>
             </div>
-            <button type="submit" disabled={!isValid||isSubmitting}>
+            {submitError && (
+                <p
+                    role="alert"
+                    className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
+                >
+                    {submitError}
+                </p>
+            )}
+            <button type="submit" 
+            className="rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!isValid||isSubmitting}>
                 {isSubmitting?"התחברות...":"התחבר"}
             </button>
         </form>
