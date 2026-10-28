@@ -1,32 +1,100 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+workspace
+artifacts
+skillshelf-client-README.md
+# SkillShelf — קטלוג Skills ו־Rules
 
-Currently, two official plugins are available:
+SkillShelf היא מערכת לאיתור, צפייה והורדה של קובצי Skills ו־Rules לכלי פיתוח. הממשק בעברית ובכיווניות מימין לשמאל, ומיועד לתצוגת מחשב.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+מאגר זה מכיל את צד הלקוח ב־React. צד השרת ומסד הנתונים מנוהלים בנפרד.
 
-## React Compiler
+## קישורים
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| רכיב | כתובת |
+|---|---|
+| האתר הציבורי | https://skillshelf-client.onrender.com |
+| מאגר צד הלקוח | https://github.com/ayalah2465/skillshelf-client |
+| מאגר צד השרת | https://github.com/ayalah2465/skillshelf-backend |
+| שרת API | https://skillshelf-backend.onrender.com |
+| תיעוד Swagger | https://skillshelf-backend.onrender.com/api-docs |
+| בדיקת תקינות השרת | https://skillshelf-backend.onrender.com/api/health |
 
-## Expanding the Oxlint configuration
+במסלול Render החינמי השרת עשוי להיכנס למצב שינה לאחר חוסר פעילות. הבקשה הראשונה עלולה להתעכב כ־50 שניות או יותר.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## יכולות והרשאות
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+- **לכל מבקר:** קטלוג ציבורי, חיפוש, סינון לפי סוג וקטגוריה, מעבר בין עמודים, פרטי משאב והוראות שימוש.
+- **למשתמש מחובר:** הורדת קבצים, הוספה למועדפים, צפייה במועדפים והסרה מהם.
+- **למנהל:** יצירת משאב עם קובץ, עריכת פרטים, החלפת קובץ, הסתרה ופרסום מחדש, ומעבר בין עמודי הניהול.
+- הסתרת משאב אינה מחיקה שלו ממסד הנתונים.
+- הרשמה ציבורית יוצרת משתמש רגיל בלבד. חשבון מנהל נוצר בתהליך האתחול של השרת; אין בחירת תפקיד בטופס הרשמה.
+
+## טכנולוגיות
+
+- React 19 ו־TypeScript.
+- Vite 8 לפיתוח ולבנייה.
+- React Router לניתוב.
+- React Hook Form ו־Zod לטפסים ולאימות נתונים.
+- Tailwind CSS 4 לעיצוב.
+- Fetch API לתקשורת עם השרת.
+- צד השרת: Node.js 24, Express, Prisma ו־PostgreSQL ב־Neon.
+
+הגרסאות המדויקות של תלויות צד הלקוח מתועדות ב־`package-lock.json`.
+
+## עמודי המערכת
+
+| נתיב | תפקיד |
+|---|---|
+| `/` | קטלוג, חיפוש וסינון |
+| `/resources/:id` | פרטי המשאב, הוראות, הורדה והוספה למועדפים |
+| `/register` | הרשמה |
+| `/login` | התחברות |
+| `/favorites` | מועדפים אישיים; דורש התחברות |
+| `/admin` | ניהול משאבים; דורש הרשאת מנהל |
+
+## הפעלה מקומית
+
+נדרשים Git, Node.js 24.x ו־npm.
+
+```bash
+git clone https://github.com/ayalah2465/skillshelf-client.git
+cd skillshelf-client
+npm ci
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+יש ליצור קובץ `.env.local` בשורש הפרויקט, לצד `package.json`, ולהוסיף:
+
+```dotenv
+VITE_API_URL=https://skillshelf-backend.onrender.com
+```
+
+הערך הוא כתובת הבסיס של השרת, ללא `/api` וללא לוכסן בסוף. אין להכניס למשתני `VITE_*` סיסמאות או מפתחות: הם נכללים בקוד הדפדפן ונגישים לציבור.
+
+```bash
+npm run dev
+```
+
+יש לפתוח את כתובת `Local` שבמסוף, בדרך כלל `http://localhost:5173`. השרת חייב לאפשר מקור זה ב־`CORS_ORIGINS`. לאחר שינוי משתני סביבה יש להפעיל מחדש את שרת הפיתוח.
+
+ניתן להשתמש בשרת הציבורי; אין צורך להתקין PostgreSQL כדי להפעיל את הלקוח מולו. להפעלת שרת מקומי יש לפעול לפי התיעוד במאגר ה־Backend.
+
+## פקודות
+
+| פקודה | תפקיד |
+|---|---|
+| `npm run dev` | שרת פיתוח |
+| `npm run build` | בדיקת TypeScript ובניית הקבצים לתיקיית `dist` |
+| `npm run preview` | בדיקת הבנייה האחרונה, בדרך כלל ב־`http://localhost:4173` |
+| `npm run lint` | בדיקת קוד באמצעות Oxlint |
+
+לאחר שינוי בקוד יש להריץ בנייה מחדש לפני בדיקת Preview. Preview אינו מפרסם את האתר לאינטרנט. כתובת Preview צריכה להיות מותרת ב־CORS של השרת.
+
+## התחברות וקבצים
+
+- האסימון נשמר ב־`sessionStorage` במפתח `skillshelf_access_token` ונשלח בכותרת `Authorization: Bearer <token>` בבקשות מוגנות.
+- בפתיחת האפליקציה מתבצעת בדיקת המשתמש באמצעות `/api/auth/me`. הצגת קישור הניהול תלויה בתפקיד; הרשאות הפעולות נאכפות בשרת.
+- האחסון תלוי במקור ובסשן הלשונית. אין להניח שהתחברות תעבור בין localhost, כתובת האתר הציבורי או לשוניות נפרדות. לאחר פקיעת האסימון נדרשת התחברות מחדש.
+- קובצי המשאבים המותרים הם קובצי UTF-8 מסוג `.md`,‏ `.txt` ו־`.json`, עד 1 MiB. מומלץ שם פשוט כגון `skill_example.md`, ללא רווחים, סוגריים או עברית.
+- ביצירה נדרש קובץ; בעריכה אפשר להשאיר את הקובץ הקיים ללא בחירה מחדש.
+- הורדת משאב שומרת קובץ במחשב; אין התקנה אוטומטית בכלי הפיתוח.
+
